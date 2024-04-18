@@ -253,6 +253,7 @@ map.on('click', function(e) {
 
 document.getElementById('search').addEventListener('input', function(e) {
   var query = e.target.value;
+  console.log(query);
   if (query.trim() !== '') {
       // Perform geocoding API request
       fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(query) + '.json?access_token=' + mapboxgl.accessToken)
@@ -263,7 +264,9 @@ document.getElementById('search').addEventListener('input', function(e) {
           .catch(error => {
               console.error('Error:', error);
           });
+          console.log("hello");
   } else {
+    console.log("no input");
       clearSuggestions();
   }
 });
