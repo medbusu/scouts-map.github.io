@@ -167,6 +167,9 @@ var SVY21 = (function(){
 mapboxgl.accessToken = 'pk.eyJ1IjoiaXNhZHVjayIsImEiOiJjbHY0dHVydTQwY2pmMmtsb3Q4czdhaTYzIn0.1XFd8Q4sPKz9Uz1WNhwh5w';
 
 var cv = new SVY21();
+var marker = new mapboxgl.Marker(); // Initialize marker
+var suggestionsContainer = document.getElementById('suggestions');
+
 
 var map = new mapboxgl.Map({
     container: 'map',
@@ -239,9 +242,57 @@ var map = new mapboxgl.Map({
 //     console.log("done");
 //   };
 
-map.on('mousemove', function(e) {
+map.on('click', function(e) {
     // Convert mouse position to SVY21 coordinates
     var svy21Coords = cv.computeSVY21(e.lngLat.lat, e.lngLat.lng);
     // Update textbox value with SVY21 coordinates
     document.getElementById('coordinates').innerText = 'SVY21 Coordinates: ' + svy21Coords.N.toFixed(2) + ', ' + svy21Coords.E.toFixed(2);
+
+    marker.setLngLat(e.lngLat).addTo(map);
 });
+
+document.getElementById('search').addEventListener('input', function(e) {
+  var query = e.target.value;
+  if (query.trim() !== '') {
+      // Perform geocoding API request
+      fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(query) + '.json?access_token=' + mapboxgl.accessToken)
+          .then(response => response.json())
+          .then(data => {
+              showSuggestions(data.features);
+          })
+          .catch(error => {
+              console.error('Error:', error);
+          });
+  } else {
+      clearSuggestions();
+  }
+});
+
+function showSuggestions(features) {
+  clearSuggestions();
+  console.log(features);
+  features.forEach(feature => {
+      var suggestion = document.createElement('div');
+      console.log(suggestion);
+      suggestion.classList.add('suggestion');
+      suggestion.textContent = feature.place_name;
+      suggestion.addEventListener('click', function() {
+          var coordinates = feature.center;
+          // Move the map to the searched location
+          map.flyTo({ center: coordinates, zoom: 14 });
+          // Move the marker to the searched location
+          marker.setLngLat(coordinates).addTo(map);
+          // Clear suggestions
+          clearSuggestions();
+          // Clear search input
+          document.getElementById('search').value = '';
+      });
+      suggestionsContainer.appendChild(suggestion);
+  });
+}
+
+function clearSuggestions() {
+  suggestionsContainer.innerHTML = '';
+}
+
+
