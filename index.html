@@ -9,8 +9,9 @@
   <!-- <script src="svy21.js"></script> -->
   <style>
     body { margin: 0; padding: 0; }
-    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; margin: 0; padding: 0;}
     #coordinates { position: absolute; top: 10px; right: 10px; background-color: rgba(255, 255, 255, 0.9); padding: 5px; border-radius: 3px; }
+    /* #styleButton{position: absolute; top: 100px; left: 40px;} */
     #search { position: absolute; top: 10px; left: 10px; z-index: 1; }
     #suggestions { position: absolute; top: 50px; left: 10px; z-index: 1; background-color: #fff; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; }
     .suggestion { padding: 5px; cursor: pointer; }
@@ -30,7 +31,7 @@
     .horizontal {
       width: 100%;
       height: 2px; /* Thickness of the horizontal line */
-      /* top: 50%; */
+      left: -50%;
       /* left: 0; */
     }
 
@@ -38,18 +39,41 @@
       width: 2px; /* Thickness of the vertical line */
       height: 100%;
       /* top: 0; */
-      /* left: 50%; */
+      top: -50%;
+    }
+    #menu {
+        position: absolute;
+        bottom:0px;
+        background: #efefef;
+        padding: 10px;
+        font-family: 'Open Sans', sans-serif;
+        z-index:99;
     }
 
   </style>
 </head>
 <body>
-  <div id="map">SVY Coordinates: </div>
-  <div id='coordinates'></div>
+  <div id="map"></div>
+  <div id='coordinates'>SVY Coordinates: </div>
   <div id="crosshair">
     <div class="horizontal"></div>
     <div class="vertical"></div>
   </div>
+  <div id="menu">
+    <input id="satellite-streets-v11" type="radio" name="rtoggle" value="satellite" checked="checked">
+    <!-- See a list of Mapbox-hosted public styles at -->
+    <!-- https://docs.mapbox.com/api/maps/styles/#mapbox-styles -->
+    <label for="satellite-streets-v11">satellite streets</label>
+    <input id="light-v110" type="radio" name="rtoggle" value="light">
+    <label for="light-v10">light</label>
+    <input id="dark-v10" type="radio" name="rtoggle" value="dark">
+    <label for="dark-v10">dark</label>
+    <input id="streets-v11" type="radio" name="rtoggle" value="streets">
+    <label for="streets-v11">streets</label>
+    <input id="outdoors-v11" type="radio" name="rtoggle" value="outdoors">
+    <label for="outdoors-v11">outdoors</label>
+  </div>
+  <!-- <button id="styleButton">Change Style</button> -->
   <input id='search' type='text' placeholder='Search for a location' />
   <div id='suggestions'></div>
   <script src="svy21.js"></script>

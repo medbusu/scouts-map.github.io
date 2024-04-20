@@ -202,6 +202,8 @@ var SVY21 = function () {
   };
 };
 
+// TODO: Add set styles.
+
 mapboxgl.accessToken =
   "pk.eyJ1IjoiaXNhZHVjayIsImEiOiJjbHY0dHVydTQwY2pmMmtsb3Q4czdhaTYzIn0.1XFd8Q4sPKz9Uz1WNhwh5w";
 
@@ -236,9 +238,8 @@ var map = new mapboxgl.Map({
   maxBounds: mapBounds,
 });
 
-map.on("load", function () {
-  // Generate grid squares
-  // generateGridSquares();
+
+function addDataLayer () {
   map.addSource("graticule", {
     type: "geojson",
     data: graticule,
@@ -248,10 +249,16 @@ map.on("load", function () {
     type: "line",
     source: "graticule",
   });
-  console.log("done");
+}
+map.on('styledata', function () {
+  // Triggered when `setStyle` is called.
+  addDataLayer();
+});
 
-  console.log(southwest_wgs);
-  console.log(northeast_wgs);
+map.on("load", function () {
+  // Generate grid squares
+  // generateGridSquares();
+  addDataLayer();
 });
 
 var crosshair = document.getElementById("crosshair");
@@ -261,25 +268,6 @@ map.on("mousemove", function (e) {
   crosshair.style.left = e.point.x + "px";
   crosshair.style.top = e.point.y + "px";
 });
-
-// Hide the crosshair when the mouse leaves the map
-// map.on("mouseout", function () {
-//   crosshair.style.display = "none";
-// });
-
-// Show the crosshair when the mouse enters the map
-// map.on("mouseenter", function () {
-//   crosshair.style.display = "block";
-// });
-
-//   map.on('mousemove', function(e) {
-//     // Log mouse movement
-//     console.log('Mouse position:', e.lngLat);
-
-//     // Convert mouse position to SVY21 coordinates
-//     // var svy21Coords = cv.computeSVY21(e.lngLat.lat, e.lngLat.lng);
-//     console.log('SVY21 Coordinates:', svy21Coords);
-//   });
 
 const graticule = {
   type: "FeatureCollection",
@@ -318,11 +306,8 @@ for (let northing  = southwest.N; northing  <= northeast.N; northing += 1000) {
 }
 
 map.on("click", function (e) {
-  // Convert mouse position to SVY21 coordinates
   var svy21Coords = cv.computeSVY21(e.lngLat.lat, e.lngLat.lng);
-  // Update textbox value with SVY21 coordinates
-  document.getElementById("coordinates").innerText =
-    "SVY21 Coordinates: " +
+  document.getElementById("coordinates").innerText ="SVY21 Coordinates: " +
     svy21Coords.N.toFixed(2) +
     ", " +
     svy21Coords.E.toFixed(2);
@@ -390,3 +375,14 @@ function showSuggestions(features) {
 function clearSuggestions() {
   suggestionsContainer.innerHTML = "";
 }
+
+// Add event listener to the button
+const layerList = document.getElementById('menu');
+    const inputs = layerList.getElementsByTagName('input');
+
+    for (const input of inputs) {
+        input.onclick = (layer) => {
+            const layerId = layer.target.id;
+            map.setStyle('mapbox://styles/mapbox/' + layerId);
+        };
+    }
