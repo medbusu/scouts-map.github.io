@@ -263,14 +263,14 @@ map.on("mousemove", function (e) {
 });
 
 // Hide the crosshair when the mouse leaves the map
-map.on("mouseout", function () {
-  crosshair.style.display = "none";
-});
+// map.on("mouseout", function () {
+//   crosshair.style.display = "none";
+// });
 
 // Show the crosshair when the mouse enters the map
-map.on("mouseenter", function () {
-  crosshair.style.display = "block";
-});
+// map.on("mouseenter", function () {
+//   crosshair.style.display = "block";
+// });
 
 //   map.on('mousemove', function(e) {
 //     // Log mouse movement
