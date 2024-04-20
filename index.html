@@ -15,13 +15,44 @@
     #suggestions { position: absolute; top: 50px; left: 10px; z-index: 1; background-color: #fff; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; }
     .suggestion { padding: 5px; cursor: pointer; }
     .suggestion:hover { background-color: #f0f0f0; }
+    #crosshair {
+    position: absolute;
+    width: 40px; /* Adjust the size of the crosshair as needed */
+    height: 40px; /* Adjust the size of the crosshair as needed */
+    pointer-events: none; /* Allow mouse events to pass through the crosshair */
+    }
+
+    .horizontal, .vertical {
+      position: absolute;
+      background-color: #000000; /* Black color */
+    }
+
+    .horizontal {
+      width: 100%;
+      height: 2px; /* Thickness of the horizontal line */
+      /* top: 50%; */
+      /* left: 0; */
+    }
+
+    .vertical {
+      width: 2px; /* Thickness of the vertical line */
+      height: 100%;
+      /* top: 0; */
+      /* left: 50%; */
+    }
+
   </style>
 </head>
 <body>
   <div id="map">SVY Coordinates: </div>
   <div id='coordinates'></div>
+  <div id="crosshair">
+    <div class="horizontal"></div>
+    <div class="vertical"></div>
+  </div>
   <input id='search' type='text' placeholder='Search for a location' />
   <div id='suggestions'></div>
+  <script src="svy21.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
