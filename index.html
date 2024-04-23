@@ -12,6 +12,8 @@
   <link href="https://unpkg.com/mapbox-gl-scalebar/dist/mapbox-gl-scalebar.min.css" rel="stylesheet" />
 
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet">
+  <script src='mapbox-gl-traffic.js'></script>
+    <link href='mapbox-gl-traffic.css' rel='stylesheet' />
   <!-- <script src="svy21.js"></script> -->
   <style>
     body {
@@ -131,23 +133,47 @@
       padding: 5px;
       border: 1px solid black;
     }
+    #scale-level {
+      position: absolute;
+      top: 40px;
+      left: 230px;
+      /* Adjust as needed */
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      color: black;
+      background-color: white;
+      padding: 5px;
+      border: 1px solid black;
+    }
+
+    @media print
+{    
+    .no-print, .no-print *
+    {
+        display: none !important;
+    }
+}
   </style>
 </head>
 
 <body>
   <div id="map"></div>
   <div id="scale-box"></div>
-  <div id="zoom-level"></div>
+  <div id="zoom-level"class=".no-print"></div>
+  <div id="scale-level"></div>
 
   <div id='coordinates'>SVY Coordinates: </div>
-  <div id="crosshair">
+  <div id="crosshair" class=".no-print">
     <div class="horizontal"></div>
     <div class="vertical"></div>
   </div>
-  <div id="menu">
+  <div id="menu" class=".no-print">
     <button id="in">+</button>
     <button id="setScaleButton">Set Scale to 1:50000</button>
     <button id="out">-</button>
+
+    <input type="text" id="zoomLevelInput" placeholder="Enter zoom level">
+    <button onclick="setZoomLevel()">Set Zoom Level</button>
 
     <input id="outdoors-v11" type="radio" name="rtoggle" value="outdoors" checked="checked">
     <label for="outdoors-v11">outdoors</label>

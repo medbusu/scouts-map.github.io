@@ -211,6 +211,7 @@ var cv = new SVY21();
 var marker = new mapboxgl.Marker();
 var markerMoving = new mapboxgl.Marker(); // Initialize marker
 var suggestionsContainer = document.getElementById("suggestions");
+const scaleConstant = 304030427
 
 southwest = { N: 20000, E: 2000 };
 northeast = { N: 50000, E: 51000 };
@@ -276,7 +277,9 @@ function addDataLayer() {
       'text-halo-width': 1
     },
     'minzoom': 4
-  })
+  });
+
+  
   
   // map.addLayer({
   //   "id": "countours",
@@ -306,6 +309,8 @@ map.on("load", function () {
   // Generate grid squares
   // generateGridSquares();
   addDataLayer();
+
+  
 });
 
 var crosshair = document.getElementById("crosshair");
@@ -445,8 +450,14 @@ document.getElementById("setScaleButton").addEventListener("click", function () 
   });
 
 map.on('zoom', function () {
-    var zoomLevel = document.getElementById('zoom-level');
-    zoomLevel.innerText = 'Zoom Level: ' + map.getZoom().toFixed(3);
+  var zoomLevel = document.getElementById('zoom-level');
+  var scaleLevel = document.getElementById('scale-level');
+  var level = map.getZoom();
+  var scaleLevelDisplay = scaleConstant / (2**level);
+  zoomLevel.innerText = 'Scale Bar = 1:' + scaleLevelDisplay.toFixed(0);
+  scaleLevel.innerText = 'Zoom Level: ' + level.toFixed(3);
+  // console.log("LOL", zoomLevel.innerText);
+  // 'Zoom Level: ' + level.toFixed(3) + 
 });
 
 document.getElementById("in").addEventListener("click", function () {
@@ -462,8 +473,16 @@ document.getElementById("out").addEventListener("click", function () {
   // Set the map's zoom level
   map.setZoom(zoomLevel - 1);
 });
-map.on('zoom', function () {
-  var zoomLevel = document.getElementById('zoom-level');
-  zoomLevel.innerText = 'Zoom Level: ' + map.getZoom().toFixed(3);
-});
 
+
+
+function setZoomLevel() {
+  var zoomLevel = parseFloat(document.getElementById('zoomLevelInput').value);
+  if (isNaN(zoomLevel) || zoomLevel < 0) {
+      alert('Please enter a valid positive number for the zoom level.');
+      return;
+  }
+  
+  let zoomLevelAdj = Math.log2(scaleConstant/zoomLevel)
+  map.setZoom(zoomLevelAdj);
+}
