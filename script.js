@@ -212,8 +212,8 @@ var marker = new mapboxgl.Marker();
 var markerMoving = new mapboxgl.Marker(); // Initialize marker
 var suggestionsContainer = document.getElementById("suggestions");
 
-southwest = {N: 20000, E: 2000};
-northeast = {N: 50000, E: 51000};
+southwest = { N: 20000, E: 2000 };
+northeast = { N: 50000, E: 51000 };
 southwest_wgs = cv.computeLatLon(20000, 2000);
 northeast_wgs = cv.computeLatLon(50000, 51000);
 
@@ -234,12 +234,19 @@ var map = new mapboxgl.Map({
   container: "map",
   style: "mapbox://styles/mapbox/outdoors-v11", // You can choose different map styles
   center: [103.8198, 1.3521], // Singapore coordinates
-  zoom: 10, // Adjust zoom level as needed
+  zoom: 12.57, // Adjust zoom level as needed
   maxBounds: mapBounds,
 });
 
+// Add scale control
+map.addControl(
+  new mapboxgl.ScaleControl({
+    maxWidth: 80,
+    unit: "metric",
+  })
+);
 
-function addDataLayer () {
+function addDataLayer() {
   map.addSource("graticule", {
     type: "geojson",
     data: graticule,
@@ -249,8 +256,48 @@ function addDataLayer () {
     type: "line",
     source: "graticule",
   });
+  map.addLayer({
+    id: "countour-labels",
+    type: "symbol",
+    source: {
+      type: 'vector',
+      url: 'mapbox://mapbox.mapbox-terrain-v2'
+    },
+    "source-layer": "contour",
+    'layout': {
+      'visibility': 'visible',
+      'symbol-placement': 'line',
+      'text-field': ['concat', ['to-string', ['get', 'ele']], 'm']
+    },
+    'paint': {
+      'icon-color': '#877b59',
+      'icon-halo-width': 1,
+      'text-color': '#877b59',
+      'text-halo-width': 1
+    },
+    'minzoom': 4
+  })
+  
+  // map.addLayer({
+  //   "id": "countours",
+  //   "type": "line",
+  //   "source": {
+  //     type: 'vector',
+  //     url: 'mapbox://mapbox.mapbox-terrain-v2'
+  //   },
+  //   "source-layer": "contour",
+  //   'layout': {
+  //     'visibility': 'visible',
+  //     'line-join': 'round',
+  //     'line-cap': 'round'
+  //   },
+  //   'paint': {
+  //     'line-color': '#877b59',
+  //     'line-width': 1
+  //   }
+  // })
 }
-map.on('styledata', function () {
+map.on("styledata", function () {
   // Triggered when `setStyle` is called.
   addDataLayer();
 });
@@ -275,9 +322,9 @@ const graticule = {
 };
 
 for (let easting = southwest.E; easting <= northeast.E; easting += 1000) {
-  let svy21 = cv.computeLatLon(southwest.N,easting)
+  let svy21 = cv.computeLatLon(southwest.N, easting);
   // console.log("southwest is", southwest.lat, " + ", northeast.lat);
-  
+
   graticule.features.push({
     type: "Feature",
     geometry: {
@@ -290,15 +337,15 @@ for (let easting = southwest.E; easting <= northeast.E; easting += 1000) {
     properties: { value: easting },
   });
 }
-for (let northing  = southwest.N; northing  <= northeast.N; northing += 1000) {
-  let svy21 = cv.computeLatLon(northing,southwest.E)
+for (let northing = southwest.N; northing <= northeast.N; northing += 1000) {
+  let svy21 = cv.computeLatLon(northing, southwest.E);
   graticule.features.push({
     type: "Feature",
     geometry: {
       type: "LineString",
       coordinates: [
         [southwest_wgs.lon, svy21.lat],
-        [northeast_wgs.lon, svy21.lat]
+        [northeast_wgs.lon, svy21.lat],
       ],
     },
     properties: { value: northing },
@@ -307,7 +354,8 @@ for (let northing  = southwest.N; northing  <= northeast.N; northing += 1000) {
 
 map.on("click", function (e) {
   var svy21Coords = cv.computeSVY21(e.lngLat.lat, e.lngLat.lng);
-  document.getElementById("coordinates").innerText ="SVY21 Coordinates: " +
+  document.getElementById("coordinates").innerText =
+    "SVY21 Coordinates: " +
     svy21Coords.N.toFixed(2) +
     ", " +
     svy21Coords.E.toFixed(2);
@@ -351,7 +399,7 @@ function showSuggestions(features) {
     suggestion.addEventListener("click", function () {
       var coordinates = feature.center;
       // Move the map to the searched location
-      map.flyTo({ center: coordinates, zoom: 14 });
+      map.flyTo({ center: coordinates, zoom: 12.57 });
       var svy21Coords = cv.computeSVY21(coordinates[1], coordinates[0]);
       console.log(svy21Coords);
       // Update textbox value with SVY21 coordinates
@@ -377,12 +425,45 @@ function clearSuggestions() {
 }
 
 // Add event listener to the button
-const layerList = document.getElementById('menu');
-    const inputs = layerList.getElementsByTagName('input');
+const layerList = document.getElementById("menu");
+const inputs = layerList.getElementsByTagName("input");
 
-    for (const input of inputs) {
-        input.onclick = (layer) => {
-            const layerId = layer.target.id;
-            map.setStyle('mapbox://styles/mapbox/' + layerId);
-        };
-    }
+for (const input of inputs) {
+  input.onclick = (layer) => {
+    const layerId = layer.target.id;
+    map.setStyle("mapbox://styles/mapbox/" + layerId);
+  };
+}
+
+document.getElementById("setScaleButton").addEventListener("click", function () {
+    // Calculate the zoom level for a scale of 1:50000
+    var zoomLevel = 12.57
+    console.log("Hi", zoomLevel)
+
+    // Set the map's zoom level
+    map.setZoom(zoomLevel);
+  });
+
+map.on('zoom', function () {
+    var zoomLevel = document.getElementById('zoom-level');
+    zoomLevel.innerText = 'Zoom Level: ' + map.getZoom().toFixed(3);
+});
+
+document.getElementById("in").addEventListener("click", function () {
+  // Calculate the zoom level for a scale of 1:50000
+  var zoomLevel = map.getZoom()
+  // Set the map's zoom level
+  map.setZoom(zoomLevel + 1);
+});
+
+document.getElementById("out").addEventListener("click", function () {
+  // Calculate the zoom level for a scale of 1:50000
+  var zoomLevel = map.getZoom()
+  // Set the map's zoom level
+  map.setZoom(zoomLevel - 1);
+});
+map.on('zoom', function () {
+  var zoomLevel = document.getElementById('zoom-level');
+  zoomLevel.innerText = 'Zoom Level: ' + map.getZoom().toFixed(3);
+});
+

@@ -1,66 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SVY21 Grid Overlay</title>
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+  <script src="https://unpkg.com/mapbox-gl-scalebar/dist/mapbox-gl-scalebar.min.js"></script>
+  <link href="https://unpkg.com/mapbox-gl-scalebar/dist/mapbox-gl-scalebar.min.css" rel="stylesheet" />
+
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet">
   <!-- <script src="svy21.js"></script> -->
   <style>
-    body { margin: 0; padding: 0; }
-    #map { position: absolute; top: 0; bottom: 0; width: 100%; margin: 0; padding: 0;}
-    #coordinates { position: absolute; top: 10px; right: 10px; background-color: rgba(255, 255, 255, 0.9); padding: 5px; border-radius: 3px; }
-    /* #styleButton{position: absolute; top: 100px; left: 40px;} */
-    #search { position: absolute; top: 10px; left: 10px; z-index: 1; }
-    #suggestions { position: absolute; top: 50px; left: 10px; z-index: 1; background-color: #fff; border: 1px solid #ccc; max-height: 200px; overflow-y: auto; }
-    .suggestion { padding: 5px; cursor: pointer; }
-    .suggestion:hover { background-color: #f0f0f0; }
-    #crosshair {
-    position: absolute;
-    width: 40px; /* Adjust the size of the crosshair as needed */
-    height: 40px; /* Adjust the size of the crosshair as needed */
-    pointer-events: none; /* Allow mouse events to pass through the crosshair */
+    body {
+      margin: 0;
+      padding: 0;
     }
 
-    .horizontal, .vertical {
+    #map {
       position: absolute;
-      background-color: #000000; /* Black color */
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #coordinates {
+      position: absolute;
+      top: 50px;
+      right: 10px;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 5px;
+      border-radius: 3px;
+    }
+
+    /* #styleButton{position: absolute; top: 100px; left: 40px;} */
+    #search {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1;
+    }
+
+    #suggestions {
+      position: absolute;
+      top: 50px;
+      left: 10px;
+      z-index: 1;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .suggestion {
+      padding: 5px;
+      cursor: pointer;
+    }
+
+    .suggestion:hover {
+      background-color: #f0f0f0;
+    }
+
+    #crosshair {
+      position: absolute;
+      width: 40px;
+      /* Adjust the size of the crosshair as needed */
+      height: 40px;
+      /* Adjust the size of the crosshair as needed */
+      pointer-events: none;
+      /* Allow mouse events to pass through the crosshair */
+    }
+
+    .horizontal,
+    .vertical {
+      position: absolute;
+      background-color: #000000;
+      /* Black color */
     }
 
     .horizontal {
       width: 100%;
-      height: 2px; /* Thickness of the horizontal line */
+      height: 2px;
+      /* Thickness of the horizontal line */
       left: -50%;
       /* left: 0; */
     }
 
     .vertical {
-      width: 2px; /* Thickness of the vertical line */
+      width: 2px;
+      /* Thickness of the vertical line */
       height: 100%;
       /* top: 0; */
       top: -50%;
     }
+
     #menu {
-        position: absolute;
-        bottom:0px;
-        background: #efefef;
-        padding: 10px;
-        font-family: 'Open Sans', sans-serif;
-        z-index:99;
+      position: absolute;
+      right: 0px;
+      background: #efefef;
+      padding: 10px;
+      font-family: 'Open Sans', sans-serif;
+      z-index: 99;
     }
 
+    #scale-box {
+      position: absolute;
+      top: 40px;
+      left: 40px;
+      width: 2cm;
+      /* Adjust as needed */
+      height: 2cm;
+      /* Adjust as needed */
+      border: 2px solid black;
+      background-color: transparent;
+    }
+
+    #zoom-level {
+      position: absolute;
+      top: 10px;
+      left: 230px;
+      /* Adjust as needed */
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      color: black;
+      background-color: white;
+      padding: 5px;
+      border: 1px solid black;
+    }
   </style>
 </head>
+
 <body>
   <div id="map"></div>
+  <div id="scale-box"></div>
+  <div id="zoom-level"></div>
+
   <div id='coordinates'>SVY Coordinates: </div>
   <div id="crosshair">
     <div class="horizontal"></div>
     <div class="vertical"></div>
   </div>
   <div id="menu">
-    <input id="satellite-streets-v11" type="radio" name="rtoggle" value="satellite" checked="checked">
+    <button id="in">+</button>
+    <button id="setScaleButton">Set Scale to 1:50000</button>
+    <button id="out">-</button>
+
+    <input id="outdoors-v11" type="radio" name="rtoggle" value="outdoors" checked="checked">
+    <label for="outdoors-v11">outdoors</label>
+    <input id="satellite-streets-v11" type="radio" name="rtoggle" value="satellite">
     <!-- See a list of Mapbox-hosted public styles at -->
     <!-- https://docs.mapbox.com/api/maps/styles/#mapbox-styles -->
     <label for="satellite-streets-v11">satellite streets</label>
@@ -70,8 +161,6 @@
     <label for="dark-v10">dark</label>
     <input id="streets-v11" type="radio" name="rtoggle" value="streets">
     <label for="streets-v11">streets</label>
-    <input id="outdoors-v11" type="radio" name="rtoggle" value="outdoors">
-    <label for="outdoors-v11">outdoors</label>
   </div>
   <!-- <button id="styleButton">Change Style</button> -->
   <input id='search' type='text' placeholder='Search for a location' />
@@ -79,4 +168,5 @@
   <script src="svy21.js"></script>
   <script src="script.js"></script>
 </body>
+
 </html>
