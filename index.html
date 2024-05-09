@@ -113,11 +113,11 @@
       position: absolute;
       top: 40px;
       left: 40px;
-      width: 2cm;
+      width: 4cm;
       /* Adjust as needed */
-      height: 2cm;
+      height: 4cm;
       /* Adjust as needed */
-      border: 2px solid black;
+      border: 1px dashed red;
       background-color: transparent;
     }
 
@@ -153,6 +153,19 @@
         display: none !important;
     }
 }
+
+    #toggleButton {
+          position: absolute;
+          bottom: 40px;
+          right: 40px;
+          /* Adjust as needed */
+          font-family: Arial, sans-serif;
+          font-size: 10px;
+          color: black;
+          background-color: white;
+          padding: 5px;
+          border: 1px solid black;
+        }
   </style>
 </head>
 
@@ -161,8 +174,8 @@
   <div id="scale-box"></div>
   <div id="zoom-level"class=".no-print"></div>
   <div id="scale-level"></div>
-
-  <div id='coordinates'>SVY Coordinates: </div>
+  
+  <div id='coordinates'>SVY21 Coordinates (E,N)</div>
   <div id="crosshair" class=".no-print">
     <div class="horizontal"></div>
     <div class="vertical"></div>
@@ -171,10 +184,10 @@
     <button id="in">+</button>
     <button id="setScaleButton">Set Scale to 1:50000</button>
     <button id="out">-</button>
-
+    
     <input type="text" id="zoomLevelInput" placeholder="Enter zoom level">
     <button onclick="setZoomLevel()">Set Zoom Level</button>
-
+    
     <input id="outdoors-v11" type="radio" name="rtoggle" value="outdoors" checked="checked">
     <label for="outdoors-v11">outdoors</label>
     <input id="satellite-streets-v11" type="radio" name="rtoggle" value="satellite">
@@ -189,8 +202,9 @@
     <label for="streets-v11">streets</label>
   </div>
   <!-- <button id="styleButton">Change Style</button> -->
-  <input id='search' type='text' placeholder='Search for a location' />
-  <div id='suggestions'></div>
+  <input id='search' type='text' placeholder='Search for a location' class=".no-print"/>
+  <div id='suggestions' class=".no-print"></div>
+  <button id="toggleButton" class=".no-print">Toggle Display</button>
   <script src="svy21.js"></script>
   <script src="script.js"></script>
 </body>

@@ -200,6 +200,7 @@ var SVY21 = function () {
 
     return { lat: lat / (Math.PI / 180), lon: lon / (Math.PI / 180) };
   };
+
 };
 
 // TODO: Add set styles.
@@ -207,11 +208,12 @@ var SVY21 = function () {
 mapboxgl.accessToken =
   "pk.eyJ1IjoiaXNhZHVjayIsImEiOiJjbHY0dHVydTQwY2pmMmtsb3Q4czdhaTYzIn0.1XFd8Q4sPKz9Uz1WNhwh5w";
 
-var cv = new SVY21();
+var  cv = new SVY21();
 var marker = new mapboxgl.Marker();
 var markerMoving = new mapboxgl.Marker(); // Initialize marker
 var suggestionsContainer = document.getElementById("suggestions");
-const scaleConstant = 304030427
+var zoomDefault = 12.535
+const scaleConstant = (2**zoomDefault) * 50000 // 2^Zoom Level * Expected Scale
 
 southwest = { N: 20000, E: 2000 };
 northeast = { N: 50000, E: 51000 };
@@ -235,7 +237,7 @@ var map = new mapboxgl.Map({
   container: "map",
   style: "mapbox://styles/mapbox/outdoors-v11", // You can choose different map styles
   center: [103.8198, 1.3521], // Singapore coordinates
-  zoom: 12.57, // Adjust zoom level as needed
+  zoom: zoomDefault, // Adjust zoom level as needed
   maxBounds: mapBounds,
 });
 
@@ -278,27 +280,6 @@ function addDataLayer() {
     },
     'minzoom': 4
   });
-
-  
-  
-  // map.addLayer({
-  //   "id": "countours",
-  //   "type": "line",
-  //   "source": {
-  //     type: 'vector',
-  //     url: 'mapbox://mapbox.mapbox-terrain-v2'
-  //   },
-  //   "source-layer": "contour",
-  //   'layout': {
-  //     'visibility': 'visible',
-  //     'line-join': 'round',
-  //     'line-cap': 'round'
-  //   },
-  //   'paint': {
-  //     'line-color': '#877b59',
-  //     'line-width': 1
-  //   }
-  // })
 }
 map.on("styledata", function () {
   // Triggered when `setStyle` is called.
@@ -328,7 +309,7 @@ const graticule = {
 
 for (let easting = southwest.E; easting <= northeast.E; easting += 1000) {
   let svy21 = cv.computeLatLon(southwest.N, easting);
-  // console.log("southwest is", southwest.lat, " + ", northeast.lat);
+  console.log("southwest is", easting, " ", " + ", northeast_wgs.lat,  " + svy ", svy21.lon);
 
   graticule.features.push({
     type: "Feature",
@@ -344,6 +325,7 @@ for (let easting = southwest.E; easting <= northeast.E; easting += 1000) {
 }
 for (let northing = southwest.N; northing <= northeast.N; northing += 1000) {
   let svy21 = cv.computeLatLon(northing, southwest.E);
+  console.log("southwest is", southwest_wgs.lon, " + ", northeast_wgs.lon, " + svy ", svy21.lat);
   graticule.features.push({
     type: "Feature",
     geometry: {
@@ -360,10 +342,10 @@ for (let northing = southwest.N; northing <= northeast.N; northing += 1000) {
 map.on("click", function (e) {
   var svy21Coords = cv.computeSVY21(e.lngLat.lat, e.lngLat.lng);
   document.getElementById("coordinates").innerText =
-    "SVY21 Coordinates: " +
-    svy21Coords.N.toFixed(2) +
+    "SVY21 Coordinates (E,N): " +
+    svy21Coords.E.toFixed(2) +
     ", " +
-    svy21Coords.E.toFixed(2);
+    svy21Coords.N.toFixed(2);
 
   marker.setLngLat(e.lngLat).addTo(map);
 });
@@ -442,7 +424,7 @@ for (const input of inputs) {
 
 document.getElementById("setScaleButton").addEventListener("click", function () {
     // Calculate the zoom level for a scale of 1:50000
-    var zoomLevel = 12.57
+    var zoomLevel = zoomDefault
     console.log("Hi", zoomLevel)
 
     // Set the map's zoom level
@@ -485,4 +467,24 @@ function setZoomLevel() {
   
   let zoomLevelAdj = Math.log2(scaleConstant/zoomLevel)
   map.setZoom(zoomLevelAdj);
+}
+
+//For toggle Appearance
+
+document.getElementById('toggleButton').addEventListener('click', function() {
+  toggleVisibility('zoom-level');
+  toggleVisibility('scale-level');
+  toggleVisibility('menu');
+  toggleVisibility('search');
+  toggleVisibility('suggestions');
+  toggleVisibility('coordinates');
+});
+
+function toggleVisibility(elementId) {
+  var element = document.getElementById(elementId);
+  if (element.style.display === 'none') {
+    element.style.display = 'block';
+  } else {
+    element.style.display = 'none';
+  }
 }
